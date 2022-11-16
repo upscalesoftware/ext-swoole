@@ -1,9 +1,6 @@
 name: Release Sync
 on:
-  push:
-  pull_request:
-  schedule:
-    - cron: '*/15 * * * *'
+  workflow_dispatch:
 
 jobs:
   check:

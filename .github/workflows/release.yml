@@ -17,11 +17,13 @@ jobs:
       - name: Fetch release tags
         id: fetch
         run: |
-          official_releases="$(./.github/workflows/fetch_releases.sh 'swoole/swoole-src')"
-          mirrored_releases="$(./.github/workflows/fetch_releases.sh '${{ github.repository }}')"
-          missing_releases="$(echo "$official_releases $mirrored_releases" | jq -s '.[0] - .[1]')"
-          recent_releases="$(echo "$missing_releases" | jq '.[0:10]')"
-          echo "tags=$recent_releases" >> $GITHUB_OUTPUT
+          ./.github/workflows/fetch_releases.sh 'swoole/swoole-src' > official_releases.json
+          ./.github/workflows/fetch_releases.sh '${{ github.repository }}' > mirrored_releases.json
+          jq -s '.[0] - .[1]' official_releases.json mirrored_releases.json > missing_releases.json
+          jq '.[0:10]' missing_releases.json > recent_releases.json
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
+          cat recent_releases.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
